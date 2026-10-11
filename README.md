@@ -341,3 +341,41 @@ Potential improvements include:
 - Terraform infrastructure as code
 - Checkov infrastructure security scanning
 - Technical documentation and security trade-off analysis
+
+
+## 🎓 Project Purpose
+
+This repository is maintained as a **standalone SC-900 learning project**, focusing on Microsoft Entra ID, identity management, authentication concepts, and Azure Role-Based Access Control (RBAC).
+
+The project provides hands-on experience with identity and access management concepts by implementing test users, security groups, role assignments, and permission validation in Microsoft Azure.
+
+It is separate from the Secure Linux Web Server project, which focuses on foundational Azure infrastructure concepts relevant to AZ-900.
+
+A future Azure Enterprise Infrastructure project may build on the knowledge gained from both learning projects, but it will have its own repository, architecture, and cumulative implementation history.
+
+
+## ⚠️ Project Status
+
+**Status: Completed and documented**
+
+The Azure infrastructure was deployed and validated. Testing covered identity configuration, group-based RBAC assignments, permission boundaries, SSH key-based access, Terraform validation, and Checkov security scanning.
+
+The Azure infrastructure resources were deleted after validation to avoid unnecessary cloud charges. Project documentation, configuration files, architecture diagrams, and screenshots remain in this repository as a record of the implementation.
+
+**Important:** The repository documents the completed implementation. The Azure infrastructure is not currently running, and the resources would need to be redeployed to repeat the infrastructure validation tests.
+
+
+## 👨‍💻 Author
+
+**Faizan Khan Khaleel**
+
+BCA | Cloud Architecture & Cybersecurity
+
+Areas explored through this project:
+
+- ☁️ Cloud Computing
+- 🔐 Cybersecurity Fundamentals
+- 🪪 Microsoft Entra ID and Identity Management
+- 🛡️ Azure Role-Based Access Control (RBAC)
+- 🏗️ Infrastructure as Code with Terraform
+- 🔎 Infrastructure Security Scanning with Checkov
