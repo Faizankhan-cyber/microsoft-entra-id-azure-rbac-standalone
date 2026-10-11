@@ -1,4 +1,9 @@
-# 🔐 V2 - Identity & Access Security
+### ⚠️ Important: Project Structure Update
+
+This repository was originally maintained as a single, combined Azure Enterprise Infrastructure project containing both V1 (Secure Linux Web Server) and V2 (Identity & Access Security). These components have since been separated into independent projects with their own repositories and documentation. Some Azure resource names and historical screenshots may still reference the original V1/V2 naming convention. These references reflect the project's development history and do not indicate that the projects remain combined.
+
+
+# 🔐 Identity & Access Security
 
 ## 📌 Overview
 
