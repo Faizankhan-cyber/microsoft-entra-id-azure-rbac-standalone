@@ -1,0 +1,11 @@
+project_name           = "v2-identity-access-security"
+location               = "Central India"
+resource_group_name    = "rg-v2-identity-access-security"
+vnet_address_space     = ["10.20.0.0/16"]
+subnet_address_prefix  = "10.20.1.0/24"
+vm_name                = "vm-v2-secure-linux"
+vm_size                = "Standard_B2s_v2"
+admin_username         = "azureadmin"
+
+# Replace this with your SSH public key.
+admin_ssh_public_key = "ssh-ed25519 AAAA...your-public-key..."
