@@ -1,35 +1,42 @@
-# Microsoft Entra ID & Azure RBAC: Identity and Access Management
+# Microsoft Entra ID and Azure RBAC
 
-> **⚠️ Important: Project Structure Update**
->
-> This project was originally maintained as part of a combined Azure Enterprise Infrastructure repository containing both a Secure Linux Web Server project and an Identity & Access Security project. They have since been separated into independent repositories with their own documentation. Some Azure resource names, folder names, and historical screenshots may still use the original V1/V2 labels because they were created before the separation. These labels are retained for historical accuracy and do not mean the projects are still combined.
+**Repository:** https://github.com/Faizankhan-cyber/microsoft-entra-id-azure-rbac-standalone
 
-## 📌 Overview
+**Related project:** [Secure Linux Web Server on Azure](https://github.com/Faizankhan-cyber/secure-linux-web-server-azure)
 
-This project demonstrates identity and access management for Azure infrastructure using Microsoft Entra ID, Azure role-based access control (RBAC), least-privilege access, Terraform, and Checkov.
 
-The lab separates development, security-monitoring, and infrastructure-administration responsibilities into distinct Entra ID security groups. Terraform defines the Azure infrastructure, while Checkov scans the configuration for potential security risks.
+## Overview
 
-**Note:** The Azure resources used for validation have been deleted after testing to avoid ongoing charges. This repository preserves the Terraform configuration, documentation, security findings, and screenshots as project evidence.
+This standalone SC-900 learning project demonstrates identity and access management for Azure infrastructure using Microsoft Entra ID, Azure role-based access control (RBAC), Terraform, and Checkov.
 
-## 🎯 Objectives
+Test users are organized into security groups for development, security monitoring, and infrastructure administration. Terraform defines the Azure infrastructure, and Checkov scans its configuration for potential security issues.
 
-- Implement identity-based access to Azure resources.
-- Apply the principle of least privilege.
-- Separate development, security-monitoring, and infrastructure-administration responsibilities.
-- Define Azure infrastructure using Terraform.
-- Restrict administrative network access.
-- Disable password-based SSH authentication.
-- Scan Terraform configuration with Checkov.
-- Test and document access-control behavior.
+This lab was built after completing the Microsoft SC-900 exam to apply security, compliance, and identity concepts in practice.
 
-## 🏗️ Architecture
+The Azure resources used for validation were deleted after testing to avoid ongoing charges. This repository retains the Terraform configuration, documentation, security findings, and screenshots as evidence of the implementation.
 
-The lab consists of three logical layers:
+> **Project structure:** This project was previously part of a combined Azure Enterprise Infrastructure repository that also contained a Secure Linux Web Server project. The projects now have separate repositories and documentation. Some resource names, folder names, and historical screenshots may retain the original V1/V2 labels; these labels do not mean the projects are still combined.
 
-1. **Identity:** Microsoft Entra ID users and security groups.
-2. **Authorization:** Azure RBAC role assignments that determine what each group can do.
-3. **Infrastructure and networking:** An Azure resource group containing a virtual network, subnet, network security group, public IP, network interface, and Linux virtual machine.
+## Project Scope
+
+The lab focuses on:
+
+- Microsoft Entra ID users and security groups
+- Azure RBAC and least-privilege access
+- Separation of development, security-monitoring, and infrastructure-administration responsibilities
+- Terraform-defined Azure infrastructure
+- Restricted administrative network access and SSH key authentication
+- Checkov scanning and access-control validation
+
+It is separate from the Secure Linux Web Server project, which focuses on foundational Azure infrastructure concepts relevant to AZ-900. A future Azure Enterprise Infrastructure project may build on both learning projects, but it will have its own repository, architecture, and implementation history.
+
+## Architecture
+
+The lab has three logical layers:
+
+1. **Identity:** Microsoft Entra ID users and security groups
+2. **Authorization:** Azure RBAC role assignments that control access at the assigned scope
+3. **Infrastructure and networking:** An Azure resource group containing a virtual network, subnet, network security group, public IP, network interface, and Linux virtual machine
 
 ```text
 Microsoft Entra ID
@@ -50,34 +57,30 @@ Azure RBAC Role Assignments
                       v
              Azure Resource Group
                       |
-          +-----------+-----------+
-          |           |           |
-         VNet        NSG       Linux VM
-          |
-        Subnet
-          |
-       Public IP
+        Virtual Network, Subnet, NSG,
+        Public IP, Network Interface,
+               and Linux VM
 ```
 
 Microsoft Entra ID organizes identities, Azure RBAC controls their permissions at the assigned scope, and network security rules restrict access to the virtual machine.
 
-## 👤 Identity and Access Model
+## Identity and Access Model
 
 Microsoft Entra ID was used to organize test users into security groups.
 
-### 👥 Security Groups
+### Security Groups
 
 | Group | Responsibility |
 |---|---|
-| `Cloud-Developers` | Manage the lab virtual machine while being unable to administer RBAC assignments |
+| `Cloud-Developers` | Manage the lab virtual machine without administering RBAC assignments |
 | `Security-Team` | Read resource and security configuration without managing infrastructure |
-| `Cloud-Administrators` | Manage lab infrastructure without receiving RBAC administration permissions through the `Contributor` role alone |
+| `Cloud-Administrators` | Manage lab infrastructure; the `Contributor` role alone does not grant RBAC administration permissions |
 
-### 🔑 RBAC Assignments
+### RBAC Assignments
 
 The following roles were assigned at the lab resource-group scope.
 
-| Group | Azure RBAC Role | Scope |
+| Group | Azure RBAC role | Scope |
 |---|---|---|
 | `Cloud-Developers` | `Virtual Machine Contributor` | Lab resource group |
 | `Cloud-Developers` | `Reader` | Lab resource group |
@@ -85,23 +88,13 @@ The following roles were assigned at the lab resource-group scope.
 | `Security-Team` | `Reader` | Lab resource group |
 | `Cloud-Administrators` | `Contributor` | Lab resource group |
 
-The developer roles apply to eligible virtual-machine resources within the assigned resource-group scope, rather than only to one individual VM.
+The developer roles apply to eligible virtual-machine resources within the assigned resource-group scope, rather than to only one individual VM.
 
-Privileged roles such as `Owner`, `User Access Administrator`, and `Role Based Access Control Administrator` were not assigned to these groups.
+The groups were not assigned privileged roles such as `Owner`, `User Access Administrator`, or `Role Based Access Control Administrator`.
 
-## 🛡️ Least-Privilege Validation
+## Azure Infrastructure and Network Configuration
 
-Access tests were performed to check the intended permission boundaries:
-
-- **Cloud Developers:** Could view and manage the lab VM but could not modify RBAC role assignments.
-- **Security Team:** Could inspect resources and security configuration but could not start or stop the VM.
-- **Cloud Administrators:** Could manage infrastructure, but the `Contributor` role did not grant permission to assign RBAC roles.
-
-These tests demonstrate separation of responsibilities in this lab. They do not, by themselves, establish that the configuration is suitable for every production environment.
-
-## ☁️ Azure Infrastructure
-
-The lab infrastructure defined in Terraform includes:
+Terraform defines the following lab infrastructure:
 
 - Azure resource group
 - Virtual network
@@ -111,24 +104,18 @@ The lab infrastructure defined in Terraform includes:
 - Network interface
 - Ubuntu Linux virtual machine
 
-### 🌐 Network Configuration
-
 ```text
 VNet:    10.20.0.0/16
 Subnet:  10.20.1.0/24
 ```
 
-SSH access was restricted to the administrator's public IP address using a `/32` source range.
+SSH access was restricted to the administrator's public IP address using a `/32` source range. The inbound SSH rule used TCP port 22.
 
-The inbound SSH rule used TCP port 22.
+HTTP port 80 was also defined in the NSG, but **no web server was deployed on the VM**.
 
-HTTP port 80 was also defined in the NSG for the lab, but **no web server was deployed on this VM**.
+## SSH Security
 
-## 🔐 SSH Security
-
-The Linux VM used SSH key authentication, with password-based SSH authentication disabled.
-
-The configuration was checked on the VM using:
+The Linux VM used SSH key authentication, with password-based SSH authentication disabled. The configuration was checked on the VM using:
 
 ```bash
 sudo sshd -T | grep -i passwordauthentication
@@ -142,7 +129,7 @@ passwordauthentication no
 
 SSH connectivity was successfully tested from the authorized administrator network during validation.
 
-## 🧱 Infrastructure as Code
+## Infrastructure as Code
 
 Terraform was used to define and deploy the Azure infrastructure rather than creating each resource manually through the Azure portal.
 
@@ -160,7 +147,7 @@ infrastructure/
     └── .terraform.lock.hcl
 ```
 
-### 🔄 Terraform Workflow
+### Terraform Workflow
 
 ```text
 Terraform Configuration
@@ -183,11 +170,11 @@ Azure Resources
 
 The infrastructure was validated during deployment. The resources have since been removed, so running Terraform again may create billable Azure resources.
 
-## 🔎 Security Scanning with Checkov
+## Security Scanning with Checkov
 
 Checkov was used to scan the Terraform configuration for potential security issues.
 
-### ✅ Remediated Finding
+### Remediated Finding
 
 The initial scan identified a missing subnet-to-NSG association:
 
@@ -196,9 +183,9 @@ CKV2_AZURE_31
 Ensure VNET subnet is configured with a Network Security Group
 ```
 
-The subnet was explicitly associated with the NSG. The final scan reported this check as passed.
+The subnet was explicitly associated with the NSG, and the final scan reported this check as passed.
 
-### ⚠️ Remaining Findings
+### Remaining Findings
 
 Two findings remained in the final scan and were documented for review:
 
@@ -210,15 +197,15 @@ CKV_AZURE_119
 Ensure that Network Interfaces don't use public IPs
 ```
 
-The public IP was used for direct administrative SSH access in this lab. These findings were not represented as fixed; they were documented as remaining risks or trade-offs in the lab context.
+The public IP was used for direct administrative SSH access in this lab. These findings were documented as remaining risks or trade-offs in the lab context, not represented as fixed.
 
 Details and reasoning are recorded in `docs/Security/checkov-results.md`.
 
-## 🧪 Validation and Testing
+## Validation and Testing
 
 Validation was performed while the Azure environment was deployed.
 
-### Terraform Validation
+### Terraform
 
 Commands used:
 
@@ -230,11 +217,9 @@ terraform plan
 
 The recorded validation showed successful Terraform validation and a plan with no changes at the time of the check.
 
-### 🖥️ Virtual Machine and SSH
+### Virtual Machine and SSH
 
-During testing, the VM was verified as running and its Azure VM agent was ready.
-
-SSH access was established using key-based authentication:
+During testing, the VM was verified as running and its Azure VM agent was ready. SSH access was established using key-based authentication:
 
 ```bash
 ssh azureadmin@<public-ip>
@@ -242,9 +227,13 @@ ssh azureadmin@<public-ip>
 
 Replace `<public-ip>` with the VM's actual public IP when the environment is deployed. The historical public IP should not be assumed to remain available.
 
-### 👥 RBAC and Security Validation
+### RBAC and Security Controls
 
-The role assignments and access boundaries for `Cloud-Developers`, `Security-Team`, and `Cloud-Administrators` were tested.
+The role assignments and access boundaries for `Cloud-Developers`, `Security-Team`, and `Cloud-Administrators` were tested:
+
+- **Cloud Developers:** Could view and manage the lab VM but could not modify RBAC role assignments.
+- **Security Team:** Could inspect resources and security configuration but could not start or stop the VM.
+- **Cloud Administrators:** Could manage infrastructure, but `Contributor` did not grant permission to assign RBAC roles.
 
 The following controls were checked:
 
@@ -256,7 +245,9 @@ The following controls were checked:
 - Terraform configuration validated
 - Checkov scan performed and findings documented
 
-## 📸 Evidence and Documentation
+These tests demonstrate separation of responsibilities in this lab; they do not establish that the configuration is suitable for every production environment.
+
+## Evidence and Documentation
 
 Project evidence is stored in `docs/`, including architecture documentation, identity and RBAC design, permission matrices, security scan results, and screenshots.
 
@@ -271,9 +262,9 @@ The screenshots document:
 - RBAC permission boundaries
 - The lab resource group and Azure resources during deployment
 
-Some screenshot filenames and resource names may retain the original V1/V2 naming. See the project-structure notice at the top of this README.
+Some screenshot filenames and resource names may retain the original V1/V2 naming. See the project-structure notice above.
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```text
 .
@@ -305,7 +296,7 @@ Some screenshot filenames and resource names may retain the original V1/V2 namin
 
 Folder names shown in historical screenshots or documentation may differ slightly from the current repository layout.
 
-## ⚠️ Limitations and Security Trade-offs
+## Limitations and Security Trade-offs
 
 This was a controlled learning lab, not a production-ready enterprise deployment.
 
@@ -313,25 +304,13 @@ This was a controlled learning lab, not a production-ready enterprise deployment
 - Azure Bastion or a private-only administration path was not deployed.
 - No web server was deployed on the lab VM.
 - VM extensions were not used.
-- The infrastructure was intentionally kept small to control Azure student-credit usage.
+- The infrastructure was kept small to control Azure student-credit usage.
 - RBAC assignments were made at resource-group scope, which is broader than assigning permissions to a single VM.
 - Two Checkov findings remained and were documented rather than marked as remediated.
 
-These limitations identify areas that could be improved in a future iteration.
+Potential areas for future improvement include private VM access or Azure Bastion, tighter resource-level RBAC scopes where practical, additional Azure security controls, security monitoring and alerting, an improved administrative access architecture, expanded automated security checks, and enterprise-scale architecture patterns.
 
-## 🚀 Future Improvements
-
-Potential improvements include:
-
-- Private VM access or Azure Bastion
-- Tighter resource-level RBAC scopes where practical
-- Additional Azure security controls
-- Security monitoring and alerting
-- Improved administrative access architecture
-- Expanded automated security checks
-- Enterprise-scale architecture patterns
-
-## 🧠 Skills Demonstrated
+## Skills Demonstrated
 
 - Microsoft Entra ID users and security groups
 - Azure role-based access control (RBAC)
@@ -342,40 +321,19 @@ Potential improvements include:
 - Checkov infrastructure security scanning
 - Technical documentation and security trade-off analysis
 
+## Project Status
 
-## 🎓 Project Purpose
+**Completed and documented.** The Azure infrastructure was deployed and validated. Testing covered identity configuration, group-based RBAC assignments, permission boundaries, SSH key-based access, Terraform validation, and Checkov security scanning.
 
-This repository is maintained as a **standalone SC-900 learning project**, focusing on Microsoft Entra ID, identity management, authentication concepts, and Azure Role-Based Access Control (RBAC).
+The infrastructure resources were deleted after validation to avoid unnecessary cloud charges. Documentation, configuration files, architecture diagrams, and screenshots remain in this repository. The Azure infrastructure is not currently running; resources would need to be redeployed to repeat infrastructure validation tests.
 
-The project provides hands-on experience with identity and access management concepts by implementing test users, security groups, role assignments, and permission validation in Microsoft Azure.
+## Author
 
-It is separate from the Secure Linux Web Server project, which focuses on foundational Azure infrastructure concepts relevant to AZ-900.
-
-A future Azure Enterprise Infrastructure project may build on the knowledge gained from both learning projects, but it will have its own repository, architecture, and cumulative implementation history.
-
-
-## ⚠️ Project Status
-
-**Status: Completed and documented**
-
-The Azure infrastructure was deployed and validated. Testing covered identity configuration, group-based RBAC assignments, permission boundaries, SSH key-based access, Terraform validation, and Checkov security scanning.
-
-The Azure infrastructure resources were deleted after validation to avoid unnecessary cloud charges. Project documentation, configuration files, architecture diagrams, and screenshots remain in this repository as a record of the implementation.
-
-**Important:** The repository documents the completed implementation. The Azure infrastructure is not currently running, and the resources would need to be redeployed to repeat the infrastructure validation tests.
-
-
-## 👨‍💻 Author
-
-**Faizan Khan Khaleel**
-
+**Faizan Khan Khaleel**  
 BCA | Cloud Architecture & Cybersecurity
 
-Areas explored through this project:
+Areas explored through this project include cloud computing, cybersecurity fundamentals, Microsoft Entra ID and identity management, Azure RBAC, Terraform, and Checkov.
 
-- ☁️ Cloud Computing
-- 🔐 Cybersecurity Fundamentals
-- 🪪 Microsoft Entra ID and Identity Management
-- 🛡️ Azure Role-Based Access Control (RBAC)
-- 🏗️ Infrastructure as Code with Terraform
-- 🔎 Infrastructure Security Scanning with Checkov
+## License
+
+No license is currently specified in this repository. Until a license is added, do not assume the source is licensed for reuse.
